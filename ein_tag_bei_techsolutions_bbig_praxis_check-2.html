@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Ein Tag bei TechSolutions – Der BBiG-Praxis-Check mit Lukas Weber</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #F8FAFC;
+      color: #0F172A;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-card {
+      animation: fadeSlideUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F1F5F9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+
+    .touch-btn:active {
+      transform: scale(0.985);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-blue-600 selection:text-white">
+
+  <!-- Fixierte helle Top-Navigationsleiste -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
+    <div class="max-w-6xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex flex-wrap items-center justify-between gap-2">
+      
+      <!-- Branding -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-sm shadow-blue-600/20 shrink-0">
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-sm sm:text-base tracking-tight text-slate-900">TechSolutions Bayern</span>
+            <span class="hidden md:inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">WR 9 • BBiG-Praxis</span>
+          </div>
+          <p class="text-[11px] sm:text-xs text-slate-500">Ein Ausbildungstag mit Lukas Weber</p>
+        </div>
+      </div>
+
+      <!-- Fortschrittsanzeige (Pills chronologisch 07:15 bis 17:15) -->
+      <div id="progress-bar-container" class="order-3 lg:order-2 w-full lg:w-auto flex flex-wrap items-center justify-center gap-1 sm:gap-1.5 pt-1.5 lg:pt-0 border-t lg:border-t-0 border-slate-100">
+        <!-- Dynamisch befüllt -->
+      </div>
+
+      <!-- Punktestand & Cheat-Sheet Button -->
+      <div class="order-2 lg:order-3 flex items-center gap-2 sm:gap-3">
+        <div class="flex items-center gap-1.5 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-xl">
+          <span class="text-amber-500 text-sm sm:text-base">★</span>
+          <span id="score-display" class="font-mono font-bold text-sm sm:text-base text-amber-900">0</span>
+          <span class="text-xs text-amber-700 hidden sm:inline">Pkt.</span>
+        </div>
+
+        <button onclick="toggleCheatSheet(true)" class="touch-btn flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl shadow-sm transition-all cursor-pointer">
+          <span class="text-base leading-none">📖</span>
+          <span>BBiG-Cheat-Sheet</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hauptbereich -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-6 flex flex-col justify-center">
+    <div id="app-container" class="w-full">
+      <!-- Dynamischer Inhalt -->
+    </div>
+  </main>
+
+  <!-- Slide-Over Drawer für das BBiG-Cheat-Sheet (Stichwort fett am Anfang, Paragraf am Ende) -->
+  <div id="cheatsheet-overlay" class="fixed inset-0 z-50 hidden">
+    <div onclick="toggleCheatSheet(false)" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity"></div>
+    
+    <aside class="fixed inset-y-0 right-0 max-w-2xl w-full bg-white border-l border-slate-200 shadow-2xl flex flex-col z-10">
+      <!-- Drawer Header -->
+      <div class="px-4 sm:px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xl">📖</span>
+            <h2 class="text-lg sm:text-xl font-bold text-slate-900">BBiG-Cheat-Sheet</h2>
+          </div>
+          <p class="text-xs text-slate-500 mt-0.5">Stichwörter zuerst, Paragraphen am Ende – farbkodiert wie auf deinem Arbeitsblatt</p>
+        </div>
+        <button onclick="toggleCheatSheet(false)" class="touch-btn p-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-300 transition-colors cursor-pointer" aria-label="Schließen">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Farb-Legende -->
+      <div class="px-4 sm:px-6 py-2.5 bg-white border-b border-slate-200 flex flex-wrap gap-2 text-xs font-semibold">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span> Pflichten Azubi (§ 13)
+        </span>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-800 border border-blue-200">
+          <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span> Pflichten Ausbilder (§§ 14–16)
+        </span>
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-200">
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-600"></span> Schutz &amp; Vergütung (§§ 17, 25)
+        </span>
+      </div>
+
+      <!-- Gesetzestexte Scroll-Container (Stichwort zuerst, Paragraph am Ende) -->
+      <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 text-sm leading-relaxed bg-slate-50/70">
+        
+        <!-- GRÜN: § 13 BBiG -->
+        <section class="rounded-2xl bg-white border-2 border-emerald-300 shadow-xs overflow-hidden">
+          <div class="px-4 py-2.5 bg-emerald-50 border-b border-emerald-200 flex items-center justify-between">
+            <h3 class="font-bold text-emerald-900 text-base">Pflichten der Auszubildenden</h3>
+            <span class="text-xs font-mono font-bold bg-emerald-600 text-white px-2.5 py-0.5 rounded-md">Azubi • § 13 BBiG</span>
+          </div>
+          <div class="p-4 space-y-2.5 text-slate-800 text-xs sm:text-sm">
+            <div class="bg-emerald-50/70 p-2.5 rounded-xl border-l-4 border-emerald-500">
+              <div class="font-bold text-emerald-950">Lern- und Sorgfaltspflicht <span class="font-mono text-xs text-emerald-700">(§ 13 Satz 1 &amp; Nr. 1 BBiG)</span></div>
+              <p class="text-slate-700 mt-0.5">Sich bemühen, die berufliche Handlungsfähigkeit zu erwerben, und aufgetragene Aufgaben <strong>sorgfältig ausführen</strong>.</p>
+            </div>
+            <div class="bg-emerald-50/70 p-2.5 rounded-xl border-l-4 border-emerald-500">
+              <div class="font-bold text-emerald-950">Teilnahme- &amp; Berufsschulpflicht <span class="font-mono text-xs text-emerald-700">(§ 13 Nr. 2 BBiG)</span></div>
+              <p class="text-slate-700 mt-0.5">An Ausbildungsmaßnahmen und am Berufsschulunterricht teilnehmen.</p>
+            </div>
+            <div class="bg-emerald-50/70 p-2.5 rounded-xl border-l-4 border-emerald-500">
+              <div class="font-bold text-emerald-950">Weisungsgebundenheit <span class="font-mono text-xs text-emerald-700">(§ 13 Nr. 3 BBiG)</span></div>
+              <p class="text-slate-700 mt-0.5">Den Weisungen folgen, die im Rahmen der Berufsausbildung von weisungsberechtigten Personen erteilt werden.</p>
+            </div>
+            <div class="bg-emerald-50/70 p-2.5 rounded-xl border-l-4 border-emerald-500">
+              <div class="font-bold text-emerald-950">Pflegliche Behandlung der Ausbildungsmittel <span class="font-mono text-xs text-emerald-700">(§ 13 Nr. 5 BBiG)</span></div>
+              <p class="text-slate-700 mt-0.5">Werkzeug, Maschinen und sonstige Einrichtungen <strong>pfleglich behandeln</strong>.</p>
+            </div>
+            <div class="bg-emerald-50 p-2.5 rounded-xl border-l-4 border-emerald-600">
+              <div class="font-bold text-emerald-950">Schweigepflicht / Betriebsgeheimnisse <span class="font-mono text-xs text-emerald-700">(§ 13 Nr. 6 BBiG)</span></div>
+              <p class="text-slate-700 mt-0.5">Über <strong>Betriebs- und Geschäftsgeheimnisse Stillschweigen</strong> wahren.</p>
+            </div>
+            <div class="bg-emerald-50 p-2.5 rounded-xl border-l-4 border-emerald-600">
+              <div class="font-bold text-emerald-950">Ausbildungsnachweis führen <span class="font-mono text-xs text-emerald-700">(§ 13 Nr. 7 BBiG)</span></div>
+              <p class="text-slate-700 mt-0.5">Einen schriftlichen oder elektronischen <strong>Ausbildungsnachweis</strong> (Berichtsheft) ordnungsgemäß führen.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- BLAU: §§ 14-16 BBiG -->
+        <section class="rounded-2xl bg-white border-2 border-blue-300 shadow-xs overflow-hidden">
+          <div class="px-4 py-2.5 bg-blue-50 border-b border-blue-200 flex items-center justify-between">
+            <h3 class="font-bold text-blue-900 text-base">Pflichten der Ausbildenden</h3>
+            <span class="text-xs font-mono font-bold bg-blue-600 text-white px-2.5 py-0.5 rounded-md">Ausbilder • §§ 14–16 BBiG</span>
+          </div>
+          <div class="p-4 space-y-2.5 text-slate-800 text-xs sm:text-sm">
+            <div class="bg-blue-50/70 p-2.5 rounded-xl border-l-4 border-blue-500">
+              <div class="font-bold text-blue-950">Ausbildungspflicht <span class="font-mono text-xs text-blue-700">(§ 14 Abs. 1 Nr. 1 BBiG)</span></div>
+              <p class="text-slate-700 mt-0.5">Berufliche Handlungsfähigkeit planmäßig, zeitlich und sachlich gegliedert vermitteln.</p>
+            </div>
+            <div class="bg-blue-50 p-2.5 rounded-xl border-l-4 border-blue-600">
+              <div class="font-bold text-blue-950">Ausbildungsmittel kostenlos bereitstellen <span class="font-mono text-xs text-blue-700">(§ 14 Abs. 1 Nr. 3 BBiG)</span></div>
+              <p class="text-slate-700 mt-0.5">Auszubildenden <strong>kostenlos die Ausbildungsmittel</strong>, insbesondere Werkzeuge, Werkstoffe und <strong>Fachliteratur</strong> zur Verfügung stellen.</p>
+            </div>
+            <div class="bg-blue-50 p-2.5 rounded-xl border-l-4 border-blue-600">
+              <div class="font-bold text-blue-950">Ausbildungsnachweis in Ausbildungszeit <span class="font-mono text-xs text-blue-700">(§ 14 Abs. 2 BBiG)</span></div>
+              <p class="text-slate-700 mt-0.5">Zum Führen der <strong>Ausbildungsnachweise</strong> anhalten, dies <strong>während der Ausbildungszeit im Betrieb ermöglichen</strong> und regelmäßig durchsehen.</p>
+            </div>
+            <div class="bg-blue-50 p-2.5 rounded-xl border-l-4 border-blue-600">
+              <div class="font-bold text-blue-950">Ausbildungszweck beachten <span class="font-mono text-xs text-blue-700">(§ 14 Abs. 3 BBiG)</span></div>
+              <p class="text-slate-700 mt-0.5">Es dürfen <strong>nur Aufgaben übertragen werden, die dem Ausbildungszweck dienen</strong> und den körperlichen Kräften angemessen sind.</p>
+            </div>
+            <div class="bg-blue-50 p-2.5 rounded-xl border-l-4 border-blue-600">
+              <div class="font-bold text-blue-950">Freistellung für Berufsschule <span class="font-mono text-xs text-blue-700">(§ 15 Abs. 1 BBiG)</span></div>
+              <p class="text-slate-700 mt-0.5">Ausbildende <strong>dürfen Auszubildende vor einem vor 9 Uhr beginnenden Berufsschulunterricht nicht beschäftigen</strong> und müssen sie für Berufsschule und Prüfungen freistellen.</p>
+            </div>
+            <div class="bg-blue-50/70 p-2.5 rounded-xl border-l-4 border-blue-500">
+              <div class="font-bold text-blue-950">Zeugnispflicht <span class="font-mono text-xs text-blue-700">(§ 16 BBiG)</span></div>
+              <p class="text-slate-700 mt-0.5">Bei Beendigung des Berufsausbildungsverhältnisses ist ein <strong>schriftliches Zeugnis</strong> auszustellen.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- AMBER: §§ 17, 25 BBiG -->
+        <section class="rounded-2xl bg-white border-2 border-amber-300 shadow-xs overflow-hidden">
+          <div class="px-4 py-2.5 bg-amber-50 border-b border-amber-200 flex items-center justify-between">
+            <h3 class="font-bold text-amber-900 text-base">Vergütung &amp; Schutz der Auszubildenden</h3>
+            <span class="text-xs font-mono font-bold bg-amber-600 text-white px-2.5 py-0.5 rounded-md">Schutz • §§ 17, 25 BBiG</span>
+          </div>
+          <div class="p-4 space-y-2.5 text-slate-800 text-xs sm:text-sm">
+            <div class="bg-amber-50 p-2.5 rounded-xl border-l-4 border-amber-600">
+              <div class="font-bold text-amber-950">Vergütungspflicht / kein Strafabzug <span class="font-mono text-xs text-amber-800">(§ 17 BBiG)</span></div>
+              <p class="text-slate-700 mt-0.5">Anspruch auf eine <strong>angemessene, jährlich steigende Vergütung</strong>. Eine einseitige Kürzung als Strafe ist unzulässig.</p>
+            </div>
+            <div class="bg-amber-50 p-2.5 rounded-xl border-l-4 border-amber-600">
+              <div class="font-bold text-amber-950">Unabdingbarkeit / Abweichungsverbot <span class="font-mono text-xs text-amber-800">(§ 25 BBiG)</span></div>
+              <p class="text-slate-700 mt-0.5">Vereinbarungen, die <strong>zuungunsten der Auszubildenden</strong> von den Vorschriften des BBiG abweichen, sind <strong>nichtig (unwirksam)</strong>.</p>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Drawer Footer -->
+      <div class="p-4 bg-white border-t border-slate-200 flex justify-end">
+        <button onclick="toggleCheatSheet(false)" class="touch-btn w-full sm:w-auto px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition-colors cursor-pointer">
+          Zurück zum Fall-Check
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Toast-Mitteilung -->
+  <div id="toast-box" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-all duration-300">
+    <div id="toast-content" class="bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl text-sm font-medium flex items-center gap-2"></div>
+  </div>
+
+  <script>
+    // ==========================================
+    // HILFSFUNKTIONEN FÜR ILLUSTRATIONEN & MISCHEN
+    // ==========================================
+    function getLukasCharacterSVG(mood = "friendly", lookDir = "right", bodyBottom = 154) {
+      const eyeOffsetX = lookDir === "left" ? -2.5 : 2.5;
+      let mouthPath = `<path d="M40 73 Q50 81 60 73" fill="none" stroke="#1E293B" stroke-width="2.4" stroke-linecap="round"/>`;
+      let browLeft = `<path d="M34 48 Q40 45 45 48" fill="none" stroke="#1E293B" stroke-width="2.3" stroke-linecap="round"/>`;
+      let browRight = `<path d="M55 48 Q60 45 66 48" fill="none" stroke="#1E293B" stroke-width="2.3" stroke-linecap="round"/>`;
+
+      if (mood === "focused" || mood === "serious") {
+        mouthPath = `<path d="M42 75 L58 75" fill="none" stroke="#1E293B" stroke-width="2.4" stroke-linecap="round"/>`;
+        browLeft = `<path d="M34 47 L45 49" fill="none" stroke="#1E293B" stroke-width="2.3" stroke-linecap="round"/>`;
+        browRight = `<path d="M55 49 L66 47" fill="none" stroke="#1E293B" stroke-width="2.3" stroke-linecap="round"/>`;
+      } else if (mood === "proud") {
+        mouthPath = `<path d="M39 72 Q50 82 61 72" fill="none" stroke="#1E293B" stroke-width="2.4" stroke-linecap="round"/>`;
+      }
+
+      const shoulderTop = Math.min(bodyBottom - 36, 94);
+      return `
+        <!-- Oberkörper blauer Hoodie -->
+        <path d="M8 ${bodyBottom} C8 ${shoulderTop}, 92 ${shoulderTop}, 92 ${bodyBottom} Z" fill="#2563EB" stroke="#1E293B" stroke-width="2.3" stroke-linejoin="round"/>
+        <!-- Durchgehender, flächiger Hals-Block ohne Doppelstriche -->
+        <path d="M41 78 L59 78 L60 104 L40 104 Z" fill="#F6C39E"/>
+        <path d="M41 78 L40 102 M59 78 L60 102" fill="none" stroke="#1E293B" stroke-width="2.1" stroke-linecap="round"/>
+        <!-- Geschlossener Hoodie-Kragen -->
+        <path d="M31 99 Q50 115 69 99 Q50 105 31 99 Z" fill="#1D4ED8" stroke="#1E293B" stroke-width="2.1" stroke-linejoin="round"/>
+        <!-- Runde Ohren -->
+        <circle cx="24" cy="58" r="7.5" fill="#F6C39E" stroke="#1E293B" stroke-width="2.2"/>
+        <circle cx="76" cy="58" r="7.5" fill="#F6C39E" stroke="#1E293B" stroke-width="2.2"/>
+        <!-- Gesicht -->
+        <rect x="26" y="24" width="48" height="62" rx="24" fill="#F6C39E" stroke="#1E293B" stroke-width="2.3"/>
+        <!-- Jugendliche braune Frisur -->
+        <path d="M24 52 C22 26, 37 14, 56 15 C69 16, 78 27, 76 52 C74 39, 68 33, 59 32 C48 31, 38 37, 31 34 C26 32, 25 42, 24 52 Z" fill="#6B3E26" stroke="#1E293B" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M41 20 Q50 24 58 19" fill="none" stroke="#4A2816" stroke-width="2" stroke-linecap="round"/>
+        <!-- Augenbrauen & Augen -->
+        ${browLeft}
+        ${browRight}
+        <circle cx="${40 + eyeOffsetX}" cy="55" r="3" fill="#1E293B"/>
+        <circle cx="${60 + eyeOffsetX}" cy="55" r="3" fill="#1E293B"/>
+        <!-- Nase & Mund -->
+        <path d="M50 57 L48 64 L52 64" fill="none" stroke="#1E293B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        ${mouthPath}
+      `;
+    }
+
+    function getShuffledArray(arr, seed) {
+      const copy = [...arr];
+      let s = seed;
+      for (let i = copy.length - 1; i > 0; i--) {
+        s = (s * 9301 + 49297) % 233280;
+        const j = Math.floor((s / 233280) * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    // ==========================================
+    // DATENMODELL: 6 CHRONOLOGISCHE ALLTAGSFÄLLE + 1 PROFI-CHECK (17:15 UHR)
+    // ==========================================
+    const STATIONS = [
+      {
+        id: 1,
+        time: "07:15 Uhr",
+        badge: "Fall 1 • Morgens vor der Berufsschule",
+        title: "Frühschicht vor der Berufsschule",
+        location: "TechSolutions Bayern • Support-Desk",
+        sceneSender: "Herr Schneider (Ausbilder TechSolutions)",
+        sceneChannel: "Nachricht am Morgen • 07:15 Uhr",
+        sceneText: "Lukas hat heute Berufsschultag. Der Unterricht beginnt pünktlich um 08:30 Uhr. Sein Ausbilder verlangt, dass Lukas vorher noch von 07:00 bis 08:00 Uhr in den Betrieb kommt, um Kunden-E-Mails zu sortieren.",
+        contextNote: "Der Berufsschulunterricht beginnt heute vor 09:00 Uhr (um 08:30 Uhr).",
+        tipText: "💡 Schau im BBiG-Cheat-Sheet beim Stichwort „Freistellung für Berufsschule“ (blauer Bereich) nach.",
+        correctVerdict: "forbidden",
+        paragraphs: [
+          { id: "p15_1_ok", keyword: "Freistellung für Berufsschule", paraCode: "§ 15 Abs. 1 BBiG", isCorrect: true, trapType: null },
+          { id: "p15_1_trap", keyword: "Vergütungspflicht", paraCode: "§ 15 Abs. 1 BBiG", isCorrect: false, trapType: "wrongKeyword" },
+          { id: "p13_2", keyword: "Berufsschulpflicht", paraCode: "§ 13 Nr. 2 BBiG", isCorrect: false, trapType: "other" },
+          { id: "p16", keyword: "Zeugnispflicht", paraCode: "§ 16 BBiG", isCorrect: false, trapType: "other" }
+        ],
+        resolutionTitle: "Unzulässig / Verstoß! Stichwort: Freistellung für Berufsschule (§ 15 Abs. 1 BBiG).",
+        resolutionText: "Ausbildende dürfen Auszubildende vor einem vor 9:00 Uhr beginnenden Berufsschulunterricht nicht im Betrieb beschäftigen (§ 15 Abs. 1 BBiG).",
+        svgIllustration: `
+          <svg viewBox="0 0 400 250" class="w-full h-full rounded-2xl" xmlns="http://www.w3.org/2000/svg">
+            <rect width="400" height="250" fill="#EFF6FF"/>
+            <!-- Zeitplan-Tafel links -->
+            <rect x="24" y="24" width="142" height="96" rx="12" fill="#FFFFFF" stroke="#BFDBFE" stroke-width="2"/>
+            <text x="95" y="45" text-anchor="middle" fill="#1E40AF" font-size="10" font-weight="bold" font-family="sans-serif">TAGESPLAN</text>
+            <rect x="34" y="54" width="122" height="22" rx="5" fill="#FEE2E2" stroke="#EF4444" stroke-width="1"/>
+            <text x="95" y="68" text-anchor="middle" fill="#991B1B" font-family="monospace" font-size="9.5" font-weight="bold">07:15 E-Mails</text>
+            <rect x="34" y="82" width="122" height="22" rx="5" fill="#DBEAFE" stroke="#3B82F6" stroke-width="1"/>
+            <text x="95" y="96" text-anchor="middle" fill="#1E3A8A" font-family="monospace" font-size="9.5" font-weight="bold">08:30 Berufsschule</text>
+
+            <!-- Schulrucksack rechts -->
+            <rect x="294" y="132" width="66" height="84" rx="16" fill="#3B82F6" stroke="#1E293B" stroke-width="2.5"/>
+            <rect x="306" y="160" width="42" height="36" rx="8" fill="#1D4ED8" stroke="#1E293B" stroke-width="2"/>
+            <path d="M312 132 Q327 110 342 132" fill="none" stroke="#1E293B" stroke-width="4" stroke-linecap="round"/>
+
+            <!-- LUKAS WEBER -->
+            <g transform="translate(158, 62)">
+              ${getLukasCharacterSVG("focused", "left", 154)}
+            </g>
+
+            <!-- Boden -->
+            <rect x="0" y="216" width="400" height="34" fill="#DBEAFE"/>
+            <line x1="16" y1="216" x2="384" y2="216" stroke="#94A3B8" stroke-width="2.5"/>
+          </svg>
+        `
+      },
+      {
+        id: 2,
+        time: "08:30 Uhr",
+        badge: "Fall 2 • Arbeitsbeginn im Entwicklerbüro",
+        title: "Die Kaffeeküchen-Klausel",
+        location: "TechSolutions Bayern • Workspace 04",
+        sceneSender: "Dialog zwischen Herr Schneider (Ausbilder) & Lukas Weber",
+        sceneChannel: "Im Büro • 08:30 Uhr",
+        sceneText: "Im Vertrag steht unter ‚Sonstiges‘: „Der Auszubildende verpflichtet sich, täglich 30 Min. lang die Kaffeeküche zu putzen.“ Als Herr Schneider Lukas zum Putzen schicken will, lehnt Lukas freundlich ab, da Abweichungen zu Ungunsten des Azubis ungültig sind, und bittet um eine Datenbank-Aufgabe.",
+        contextNote: "Frage: Ist Lukas' Ablehnung dieser vertraglichen Putzklausel rechtens?",
+        tipText: "💡 Schau im BBiG-Cheat-Sheet beim Stichwort „Unabdingbarkeit / Abweichungsverbot“ (orangefarbener Bereich) nach.",
+        correctVerdict: "allowed",
+        paragraphs: [
+          { id: "p25_ok", keyword: "Unabdingbarkeit / Abweichungsverbot", paraCode: "§ 25 BBiG", isCorrect: true, trapType: null },
+          { id: "p25_trap", keyword: "Kündigungsfristen", paraCode: "§ 25 BBiG", isCorrect: false, trapType: "wrongKeyword" },
+          { id: "p13_6", keyword: "Schweigepflicht", paraCode: "§ 13 Nr. 6 BBiG", isCorrect: false, trapType: "other" },
+          { id: "p14_1_3", keyword: "Ausbildungsmittel", paraCode: "§ 14 Abs. 1 Nr. 3 BBiG", isCorrect: false, trapType: "other" }
+        ],
+        resolutionTitle: "Rechtens! Stichwort: Unabdingbarkeit / Abweichungsverbot (§ 25 BBiG).",
+        resolutionText: "Vereinbarungen, die zuungunsten der Auszubildenden vom BBiG abweichen (wie ausbildungsfremde Putzpflichten entgegen § 14 Abs. 3 BBiG), sind nach § 25 BBiG nichtig.",
+        svgIllustration: `
+          <svg viewBox="0 0 400 250" class="w-full h-full rounded-2xl" xmlns="http://www.w3.org/2000/svg">
+            <rect width="400" height="250" fill="#FFFBEB"/>
+            <!-- Fenster -->
+            <rect x="24" y="22" width="102" height="80" rx="10" fill="#E0F2FE" stroke="#94A3B8" stroke-width="2.5"/>
+            <line x1="75" y1="22" x2="75" y2="102" stroke="#94A3B8" stroke-width="2"/>
+            <line x1="24" y1="62" x2="126" y2="62" stroke="#94A3B8" stroke-width="2"/>
+            <!-- Firmenschild -->
+            <rect x="246" y="22" width="130" height="26" rx="7" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.5"/>
+            <text x="311" y="39" text-anchor="middle" fill="#1D4ED8" font-family="monospace" font-size="10" font-weight="bold">TECHSOLUTIONS</text>
+
+            <!-- LUKAS WEBER -->
+            <g transform="translate(144, 58)">
+              ${getLukasCharacterSVG("friendly", "right", 118)}
+            </g>
+
+            <!-- Herr Schneider (Ausbilder rechts mit Brille & Hemd) -->
+            <g transform="translate(275, 62)">
+              <path d="M10 114 C10 78, 90 78, 90 114 Z" fill="#475569" stroke="#1E293B" stroke-width="2.5" stroke-linejoin="round"/>
+              <!-- Durchgehender flächiger Hals ohne Doppelstriche -->
+              <path d="M42 66 L58 66 L59 86 L41 86 Z" fill="#F6C39E"/>
+              <path d="M42 66 L41 84 M58 66 L59 84" fill="none" stroke="#1E293B" stroke-width="2.1" stroke-linecap="round"/>
+              <path d="M43 70 Q50 74 57 70" fill="#E5B390"/>
+              <!-- Geschlossener Hemdkragen -->
+              <path d="M33 80 L50 96 L67 80 Q50 85 33 80 Z" fill="#FFFFFF" stroke="#1E293B" stroke-width="2.1" stroke-linejoin="round"/>
+              <!-- Ohren, Kopf, Haare -->
+              <circle cx="25" cy="43" r="7" fill="#F6C39E" stroke="#1E293B" stroke-width="2"/>
+              <circle cx="75" cy="43" r="7" fill="#F6C39E" stroke="#1E293B" stroke-width="2"/>
+              <rect x="27" y="14" width="46" height="56" rx="23" fill="#F6C39E" stroke="#1E293B" stroke-width="2.5"/>
+              <path d="M27 34 C27 10, 73 10, 73 34 C65 22, 35 22, 27 34 Z" fill="#64748B" stroke="#1E293B" stroke-width="2"/>
+              <!-- Brille -->
+              <rect x="35" y="37" width="12" height="9" rx="2.5" fill="none" stroke="#1E293B" stroke-width="1.8"/>
+              <rect x="53" y="37" width="12" height="9" rx="2.5" fill="none" stroke="#1E293B" stroke-width="1.8"/>
+              <line x1="47" y1="41" x2="53" y2="41" stroke="#1E293B" stroke-width="1.8"/>
+              <circle cx="41" cy="41.5" r="2.2" fill="#1E293B"/>
+              <circle cx="59" cy="41.5" r="2.2" fill="#1E293B"/>
+              <path d="M43 56 Q50 61 57 56" fill="none" stroke="#1E293B" stroke-width="2" stroke-linecap="round"/>
+            </g>
+
+            <!-- Schreibtisch -->
+            <rect x="18" y="176" width="364" height="12" rx="4" fill="#CBD5E1" stroke="#64748B" stroke-width="1.5"/>
+            <rect x="30" y="188" width="340" height="62" fill="#E2E8F0"/>
+
+            <!-- Laptop links -->
+            <rect x="44" y="122" width="84" height="50" rx="6" fill="#1E293B" stroke="#0F172A" stroke-width="2.5"/>
+            <rect x="51" y="129" width="70" height="36" rx="3" fill="#3B82F6" fill-opacity="0.25"/>
+            <text x="86" y="151" text-anchor="middle" fill="#93C5FD" font-family="monospace" font-size="10" font-weight="bold">KUNDEN-DB</text>
+            <rect x="36" y="172" width="100" height="5" rx="2" fill="#475569"/>
+          </svg>
+        `
+      },
+      {
+        id: 3,
+        time: "10:45 Uhr",
+        badge: "Fall 3 • Vormittags bei der Software-Schulung",
+        title: "Das teure IT-Fachbuch",
+        location: "TechSolutions Bayern • Besprechungstisch",
+        sceneSender: "Herr Schneider (Ausbilder TechSolutions)",
+        sceneChannel: "Gespräch am Arbeitsplatz • 10:45 Uhr",
+        sceneText: "Für die betriebliche Fachausbildung benötigt Lukas dringend ein spezielles Programmier-Handbuch (48,00 €). Herr Schneider gibt ihm die ISBN-Nummer und sagt: „Bestell dir das Buch bitte selbst auf eigene Rechnung.“",
+        contextNote: "Das Fachbuch wird für die betriebliche Ausbildung benötigt.",
+        tipText: "💡 Achtung: Zwei Antworten beginnen mit „Ausbildungsmittel“ – schau im Cheat-Sheet genau, ob die kostenlose Bereitstellung beim Ausbilder (§ 14) oder beim Azubi (§ 13) steht!",
+        correctVerdict: "forbidden",
+        paragraphs: [
+          { id: "p14_1_3_ok", keyword: "Ausbildungsmittel kostenlos bereitstellen", paraCode: "§ 14 Abs. 1 Nr. 3 BBiG", isCorrect: true, trapType: null },
+          { id: "p13_5_trap", keyword: "Ausbildungsmittel", paraCode: "§ 13 Nr. 5 BBiG", isCorrect: false, trapType: "wrongParaSameKeyword" },
+          { id: "p17", keyword: "Vergütungspflicht", paraCode: "§ 17 BBiG", isCorrect: false, trapType: "other" },
+          { id: "p16", keyword: "Zeugnispflicht", paraCode: "§ 16 BBiG", isCorrect: false, trapType: "other" }
+        ],
+        resolutionTitle: "Unzulässig / Verstoß! Stichwort: Ausbildungsmittel kostenlos bereitstellen (§ 14 Abs. 1 Nr. 3 BBiG).",
+        resolutionText: "Ausbildende müssen Auszubildenden kostenlos die Ausbildungsmittel – insbesondere Werkzeuge, Werkstoffe und Fachliteratur – zur Verfügung stellen (§ 14 Abs. 1 Nr. 3 BBiG; § 13 Nr. 5 regelt nur die pflegliche Behandlung).",
+        svgIllustration: `
+          <svg viewBox="0 0 400 250" class="w-full h-full rounded-2xl" xmlns="http://www.w3.org/2000/svg">
+            <rect width="400" height="250" fill="#F8FAFC"/>
+            <!-- Bücherregal -->
+            <rect x="26" y="28" width="110" height="10" rx="3" fill="#CBD5E1"/>
+            <rect x="34" y="10" width="12" height="18" rx="2" fill="#3B82F6"/>
+            <rect x="49" y="12" width="10" height="16" rx="2" fill="#10B981"/>
+            <rect x="62" y="8" width="14" height="20" rx="2" fill="#F59E0B"/>
+
+            <!-- LUKAS WEBER -->
+            <g transform="translate(65, 64)">
+              ${getLukasCharacterSVG("focused", "right", 118)}
+            </g>
+
+            <!-- Tisch -->
+            <rect x="20" y="182" width="360" height="12" rx="4" fill="#CBD5E1" stroke="#64748B" stroke-width="1.5"/>
+            <rect x="32" y="194" width="336" height="56" fill="#E2E8F0"/>
+
+            <!-- IT-Fachbuch in der Mitte -->
+            <g transform="translate(222, 92)">
+              <rect x="0" y="0" width="76" height="90" rx="7" fill="#1D4ED8" stroke="#1E293B" stroke-width="2.5"/>
+              <rect x="8" y="0" width="8" height="90" fill="#1E3A8A"/>
+              <text x="44" y="30" text-anchor="middle" fill="#FFFFFF" font-size="10" font-weight="bold" font-family="sans-serif">IT-FACHBUCH</text>
+              <text x="44" y="43" text-anchor="middle" fill="#DBEAFE" font-size="9" font-weight="bold" font-family="sans-serif">MODUL 2</text>
+              <rect x="18" y="54" width="52" height="24" rx="6" fill="#FBBF24" stroke="#1E293B" stroke-width="2"/>
+              <text x="44" y="70" text-anchor="middle" fill="#0F172A" font-size="12" font-weight="extrabold" font-family="monospace">48 €</text>
+            </g>
+          </svg>
+        `
+      },
+      {
+        id: 4,
+        time: "13:00 Uhr",
+        badge: "Fall 4 • Nach der Mittagspause",
+        title: "Das digitale Berichtsheft",
+        location: "TechSolutions Bayern • Workspace 04",
+        sceneSender: "Herr Schneider & Lukas Weber",
+        sceneChannel: "Im Betrieb • 13:00 Uhr",
+        sceneText: "Nach der Mittagspause weist Herr Schneider Lukas an, während seiner regulären Ausbildungszeit am Firmen-PC seinen wöchentlichen Ausbildungsnachweis (Berichtsheft) digital im kostenfrei bereitgestellten Portal auszufüllen.",
+        contextNote: "Frage: Entspricht dieses Vorgehen den gesetzlichen Regeln?",
+        tipText: "💡 Schau im BBiG-Cheat-Sheet beim Stichwort „Ausbildungsnachweis in Ausbildungszeit“ (blauer Bereich) nach.",
+        correctVerdict: "allowed",
+        paragraphs: [
+          { id: "p14_2_ok", keyword: "Ausbildungsnachweis in Ausbildungszeit", paraCode: "§ 14 Abs. 2 BBiG", isCorrect: true, trapType: null },
+          { id: "p13_3", keyword: "Weisungsgebundenheit", paraCode: "§ 13 Nr. 3 BBiG", isCorrect: false, trapType: "other" },
+          { id: "p15_1", keyword: "Freistellung für Berufsschule", paraCode: "§ 15 Abs. 1 BBiG", isCorrect: false, trapType: "other" },
+          { id: "p16", keyword: "Zeugnispflicht", paraCode: "§ 16 BBiG", isCorrect: false, trapType: "other" }
+        ],
+        resolutionTitle: "Rechtens! Stichwort: Ausbildungsnachweis in Ausbildungszeit (§ 14 Abs. 2 BBiG).",
+        resolutionText: "Ausbildende müssen das Führen des Ausbildungsnachweises während der Ausbildungszeit im Betrieb ermöglichen und das Portal/Heft kostenfrei bereitstellen (§ 14 Abs. 2 BBiG).",
+        svgIllustration: `
+          <svg viewBox="0 0 400 250" class="w-full h-full rounded-2xl" xmlns="http://www.w3.org/2000/svg">
+            <rect width="400" height="250" fill="#ECFDF5"/>
+
+            <!-- LUKAS WEBER -->
+            <g transform="translate(76, 62)">
+              ${getLukasCharacterSVG("friendly", "right", 118)}
+            </g>
+
+            <!-- Schreibtisch -->
+            <rect x="20" y="180" width="360" height="12" rx="4" fill="#CBD5E1" stroke="#64748B" stroke-width="1.5"/>
+            <rect x="32" y="192" width="336" height="58" fill="#E2E8F0"/>
+
+            <!-- Firmen-PC / Digitaler Ausbildungsnachweis rechts -->
+            <g transform="translate(226, 70)">
+              <rect x="0" y="0" width="124" height="110" rx="12" fill="#1E293B" stroke="#0F172A" stroke-width="2.5"/>
+              <rect x="8" y="8" width="108" height="94" rx="7" fill="#FFFFFF"/>
+              <rect x="14" y="14" width="96" height="18" rx="4" fill="#DBEAFE"/>
+              <text x="62" y="26" text-anchor="middle" fill="#1E40AF" font-size="8" font-weight="bold" font-family="sans-serif">BERICHTSHEFT</text>
+              <line x1="16" y1="42" x2="98" y2="42" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="16" y1="53" x2="86" y2="53" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="16" y1="64" x2="94" y2="64" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round"/>
+              <rect x="16" y="75" width="92" height="20" rx="5" fill="#D1FAE5" stroke="#10B981" stroke-width="1.2"/>
+              <text x="62" y="88" text-anchor="middle" fill="#065F46" font-size="8.5" font-weight="bold" font-family="sans-serif">✓ Im Betrieb</text>
+            </g>
+          </svg>
+        `
+      },
+      {
+        id: 5,
+        time: "14:30 Uhr",
+        badge: "Fall 5 • Nachmittags am Entwickler-Monitor",
+        title: "Code-Leak auf Instagram",
+        location: "TechSolutions Bayern • Workspace 04",
+        sceneSender: "Lukas Weber (Auszubildender, 1. Lehrjahr)",
+        sceneChannel: "Öffentliche Instagram-Story • 14:30 Uhr",
+        sceneText: "Lukas ist stolz auf ein neues, noch unveröffentlichtes Software-Projekt von TechSolutions. Er fotografiert den geheimen Programmcode auf seinem Monitor ab und postet das Bild in seiner öffentlichen Instagram-Story.",
+        contextNote: "Der unveröffentlichte Programmcode ist ein internes Betriebsgeheimnis.",
+        tipText: "💡 Schau im BBiG-Cheat-Sheet beim Stichwort „Schweigepflicht / Betriebsgeheimnisse“ (grüner Bereich) nach.",
+        correctVerdict: "forbidden",
+        paragraphs: [
+          { id: "p13_6_ok", keyword: "Schweigepflicht / Betriebsgeheimnisse", paraCode: "§ 13 Nr. 6 BBiG", isCorrect: true, trapType: null },
+          { id: "p14_1_1", keyword: "Ausbildungspflicht", paraCode: "§ 14 Abs. 1 Nr. 1 BBiG", isCorrect: false, trapType: "other" },
+          { id: "p14_1_3", keyword: "Ausbildungsmittel", paraCode: "§ 14 Abs. 1 Nr. 3 BBiG", isCorrect: false, trapType: "other" },
+          { id: "p25", keyword: "Unabdingbarkeit", paraCode: "§ 25 BBiG", isCorrect: false, trapType: "other" }
+        ],
+        resolutionTitle: "Unzulässig / Verstoß! Stichwort: Schweigepflicht / Betriebsgeheimnisse (§ 13 Nr. 6 BBiG).",
+        resolutionText: "Auszubildende sind verpflichtet, über Betriebs- und Geschäftsgeheimnisse Stillschweigen zu wahren (§ 13 Nr. 6 BBiG). Geheimer Programmcode darf niemals öffentlich gepostet werden.",
+        svgIllustration: `
+          <svg viewBox="0 0 400 250" class="w-full h-full rounded-2xl" xmlns="http://www.w3.org/2000/svg">
+            <rect width="400" height="250" fill="#F8FAFC"/>
+            <!-- Monitor links -->
+            <rect x="24" y="34" width="142" height="92" rx="10" fill="#1E293B" stroke="#0F172A" stroke-width="2.5"/>
+            <rect x="34" y="43" width="90" height="16" rx="4" fill="#EF4444"/>
+            <text x="79" y="54" text-anchor="middle" fill="#FFFFFF" font-family="monospace" font-size="8.5" font-weight="bold">GEHEIM-CODE</text>
+            <line x1="36" y1="70" x2="132" y2="70" stroke="#34D399" stroke-width="3" stroke-linecap="round"/>
+            <line x1="36" y1="82" x2="152" y2="82" stroke="#60A5FA" stroke-width="3" stroke-linecap="round"/>
+            <line x1="36" y1="94" x2="112" y2="94" stroke="#FBBF24" stroke-width="3" stroke-linecap="round"/>
+            <line x1="36" y1="106" x2="140" y2="106" stroke="#34D399" stroke-width="3" stroke-linecap="round"/>
+            <rect x="86" y="126" width="16" height="16" fill="#64748B"/>
+            <rect x="68" y="140" width="52" height="6" rx="3" fill="#475569"/>
+
+            <!-- LUKAS WEBER -->
+            <g transform="translate(156, 62)">
+              ${getLukasCharacterSVG("proud", "right", 188)}
+            </g>
+
+            <!-- Smartphone rechts -->
+            <g transform="translate(278, 42)">
+              <rect x="0" y="0" width="96" height="164" rx="16" fill="#FFFFFF" stroke="#EC4899" stroke-width="3"/>
+              <circle cx="20" cy="20" r="8" fill="#EC4899"/>
+              <text x="34" y="23" fill="#0F172A" font-size="9" font-weight="bold" font-family="sans-serif">lukas_w</text>
+              <rect x="10" y="36" width="76" height="86" rx="8" fill="#1E293B"/>
+              <line x1="18" y1="54" x2="72" y2="54" stroke="#34D399" stroke-width="2.5"/>
+              <line x1="18" y1="66" x2="78" y2="66" stroke="#60A5FA" stroke-width="2.5"/>
+              <line x1="18" y1="78" x2="58" y2="78" stroke="#FBBF24" stroke-width="2.5"/>
+              <rect x="16" y="96" width="64" height="18" rx="4" fill="#EC4899"/>
+              <text x="48" y="108" text-anchor="middle" fill="#FFFFFF" font-size="8" font-weight="bold" font-family="sans-serif">INSTA-STORY</text>
+              <rect x="14" y="132" width="68" height="20" rx="10" fill="#2563EB"/>
+              <text x="48" y="145" text-anchor="middle" fill="#FFFFFF" font-size="8.5" font-weight="bold" font-family="sans-serif">Öffentlich ➤</text>
+            </g>
+          </svg>
+        `
+      },
+      {
+        id: 6,
+        time: "16:15 Uhr",
+        badge: "Fall 6 • Kurz vor Feierabend",
+        title: "Gehaltsabzug als Strafe",
+        location: "TechSolutions Bayern • Personalbüro",
+        sceneSender: "Herr Schneider (Ausbilder TechSolutions)",
+        sceneChannel: "Gespräch • 16:15 Uhr",
+        sceneText: "Weil Lukas gestern vergessen hat, sein Berichtsheft pünktlich vorzulegen, droht ihm sein Ausbilder verärgert: „Als Strafe ziehe ich dir diesen Monat einfach 100 Euro von deiner Ausbildungsvergütung ab!“",
+        contextNote: "Die Ausbildungsvergütung ist vertraglich vereinbart.",
+        tipText: "💡 Schau im BBiG-Cheat-Sheet beim Stichwort „Vergütungspflicht / kein Strafabzug“ (orangefarbener Bereich) nach.",
+        correctVerdict: "forbidden",
+        paragraphs: [
+          { id: "p17_ok", keyword: "Vergütungspflicht / kein Strafabzug", paraCode: "§ 17 BBiG", isCorrect: true, trapType: null },
+          { id: "p13_1", keyword: "Lernpflicht", paraCode: "§ 13 Nr. 1 BBiG", isCorrect: false, trapType: "other" },
+          { id: "p14_3", keyword: "Ausbildungszweck", paraCode: "§ 14 Abs. 3 BBiG", isCorrect: false, trapType: "other" },
+          { id: "p16", keyword: "Zeugnispflicht", paraCode: "§ 16 BBiG", isCorrect: false, trapType: "other" }
+        ],
+        resolutionTitle: "Unzulässig / Verstoß! Stichwort: Vergütungspflicht / kein Strafabzug (§ 17 BBiG).",
+        resolutionText: "Ausbildende sind verpflichtet, die vereinbarte angemessene Ausbildungsvergütung vollständig zu zahlen (§ 17 BBiG). Eine einseitige Kürzung der Vergütung als Strafe ist unzulässig.",
+        svgIllustration: `
+          <svg viewBox="0 0 400 250" class="w-full h-full rounded-2xl" xmlns="http://www.w3.org/2000/svg">
+            <rect width="400" height="250" fill="#FFFBEB"/>
+
+            <!-- LUKAS WEBER -->
+            <g transform="translate(74, 64)">
+              ${getLukasCharacterSVG("serious", "right", 118)}
+            </g>
+
+            <!-- Schreibtisch -->
+            <rect x="20" y="182" width="360" height="12" rx="4" fill="#CBD5E1" stroke="#64748B" stroke-width="1.5"/>
+            <rect x="32" y="194" width="336" height="56" fill="#E2E8F0"/>
+
+            <!-- Gehaltsabrechnung rechts -->
+            <g transform="translate(226, 48)">
+              <rect x="0" y="0" width="134" height="124" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+              <rect x="12" y="12" width="110" height="20" rx="4" fill="#EFF6FF"/>
+              <text x="67" y="25" text-anchor="middle" fill="#1E40AF" font-size="8.5" font-weight="bold" font-family="sans-serif">VERGÜTUNG</text>
+              <text x="16" y="48" fill="#334155" font-size="9" font-family="monospace">1. Lehrjahr: 1.050 €</text>
+              <rect x="12" y="58" width="110" height="24" rx="5" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.2"/>
+              <text x="67" y="73" text-anchor="middle" fill="#991B1B" font-size="9.5" font-weight="bold" font-family="monospace">Abzug: -100 €</text>
+              <line x1="14" y1="94" x2="120" y2="94" stroke="#CBD5E1" stroke-width="1.5"/>
+              <text x="16" y="110" fill="#64748B" font-size="8.5" font-family="sans-serif">Auszahlung gekürzt</text>
+            </g>
+          </svg>
+        `
+      }
+    ];
+
+    // ==========================================
+    // PROFI-CHECK (17:15 UHR) MIT EIGENEM INFOKASTEN ZUM URLAUBSANSPRUCH
+    // ==========================================
+    const PROFI_STATION = {
+      id: 7,
+      time: "17:15 Uhr",
+      badge: "★ PROFI-CHECK • Zwei-Schritte-Prüfung mit Infokasten",
+      title: "Urlaubsanspruch & Zeugnisverzicht",
+      location: "TechSolutions Bayern • Entwicklerbüro",
+      sceneSender: "Herr Schneider (Ausbilder TechSolutions)",
+      sceneChannel: "Zusatz-Zettel vor Feierabend • 17:15 Uhr",
+      sceneText: "Vor Feierabend legt Herr Schneider dem 16-jährigen Lukas (zu Jahresbeginn 16 Jahre alt) einen Zusatz-Zettel vor: „Da wir viel zu tun haben, bekommst du in diesem Kalenderjahr insgesamt nur 22 Werktage Jahresurlaub. Außerdem unterschreibst du hier, dass du am Ende deiner Ausbildung auf ein schriftliches Zeugnis verzichtest, um uns Büroarbeit zu sparen.“",
+      contextNote: "Lies im Infokasten links/oben nach, wie viele Urlaubstage Lukas zustehen!",
+      tipText: "💡 Lies im Infokasten die Zeile für 16-Jährige (unter 17 Jahren) ab und prüfe für Punkt B im BBiG-Cheat-Sheet die Stichworte „Unabdingbarkeit / Abweichungsverbot (§ 25 BBiG)“ und „Zeugnispflicht (§ 16 BBiG)“!",
+      stepAOptions: [
+        { id: "profiA_ok", keyword: "Mindesturlaub für 16-Jährige: mind. 27 Werktage pro Jahr", paraCode: "laut Infokasten / Gesetz", isCorrect: true },
+        { id: "profiA_2", keyword: "Mindesturlaub für 16-Jährige: 22 Werktage reichen aus", paraCode: "laut Infokasten / Gesetz", isCorrect: false },
+        { id: "profiA_3", keyword: "Mindesturlaub für 16-Jährige: mind. 30 Werktage pro Jahr", paraCode: "laut Infokasten / Gesetz", isCorrect: false }
+      ],
+      stepBOptions: [
+        { id: "profiB_ok", keyword: "Unabdingbarkeit / Abweichungsverbot & Zeugnispflicht", paraCode: "§ 25 BBiG i. V. m. § 16 BBiG", isCorrect: true },
+        { id: "profiB_2", keyword: "Weisungsgebundenheit (Verzicht ist auf Wunsch möglich)", paraCode: "§ 13 Nr. 3 BBiG", isCorrect: false },
+        { id: "profiB_3", keyword: "Ausbildungsnachweis in Ausbildungszeit", paraCode: "§ 14 Abs. 2 BBiG", isCorrect: false }
+      ],
+      resolutionTitle: "Stark gelöst! Beide Punkte auf dem Zusatz-Zettel sind unwirksam.",
+      resolutionText: "1. Verstoß A: Laut Infokasten stehen einem zu Jahresbeginn 16-jährigen Azubi (unter 17 Jahren) mindestens 27 Werktage Jahresurlaub zu – 22 Werktage sind zu wenig! 2. Verstoß B: Der Verzicht auf ein schriftliches Zeugnis (§ 16 BBiG) weicht zuungunsten von Lukas vom BBiG ab und ist nach § 25 BBiG (Unabdingbarkeit) nichtig.",
+      svgIllustration: `
+        <svg viewBox="0 0 400 250" class="w-full h-full rounded-2xl" xmlns="http://www.w3.org/2000/svg">
+          <rect width="400" height="250" fill="#FFFBEB"/>
+          <!-- Hinweis-Karte -->
+          <rect x="20" y="22" width="190" height="64" rx="12" fill="#FFFFFF" stroke="#FCD34D" stroke-width="2"/>
+          <text x="115" y="45" text-anchor="middle" fill="#B45309" font-family="monospace" font-size="11.5" font-weight="bold">17:15 UHR • LUKAS (16 J.)</text>
+          <text x="115" y="66" text-anchor="middle" fill="#475569" font-family="sans-serif" font-size="10" font-weight="bold">22 Tage Urlaub + Zeugnisverzicht</text>
+
+          <!-- LUKAS WEBER -->
+          <g transform="translate(88, 66)">
+            ${getLukasCharacterSVG("serious", "right", 118)}
+          </g>
+
+          <!-- Schreibtisch -->
+          <rect x="20" y="184" width="360" height="12" rx="4" fill="#CBD5E1" stroke="#64748B" stroke-width="1.5"/>
+          <rect x="32" y="196" width="336" height="54" fill="#E2E8F0"/>
+
+          <!-- Vertragsdokument rechts -->
+          <g transform="translate(232, 54)">
+            <rect x="0" y="0" width="132" height="122" rx="10" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2"/>
+            <rect x="12" y="12" width="108" height="18" rx="4" fill="#FEF3C7"/>
+            <text x="66" y="24" text-anchor="middle" fill="#92400E" font-size="8.5" font-weight="bold" font-family="sans-serif">ZUSATZ-ZETTEL</text>
+            <text x="14" y="46" fill="#334155" font-size="8.5" font-family="sans-serif">1. Nur 22 Tage Urlaub</text>
+            <text x="14" y="61" fill="#334155" font-size="8.5" font-family="sans-serif">2. Verzicht auf Zeugnis</text>
+            <rect x="14" y="76" width="104" height="28" rx="6" fill="#FEE2E2" stroke="#EF4444" stroke-width="1.2"/>
+            <text x="66" y="93" text-anchor="middle" fill="#991B1B" font-size="8.5" font-weight="bold" font-family="monospace">2-SCHRITTE-CHECK</text>
+          </g>
+        </svg>
+      `
+    };
+
+    // ==========================================
+    // ANWENDUNGSZUSTAND (STATE)
+    // ==========================================
+    const state = {
+      screen: "welcome", // "welcome" | "station" | "profi" | "summary"
+      currentIndex: 0,
+      score: 0,
+      results: {},
+      step1Choice: null,
+      step2Choice: null,
+      attempts: 0,
+      solved: false,
+      feedbackHint: null,
+      tipOpen: false,
+      profiChoiceA: null,
+      profiChoiceB: null,
+      profiAttempts: 0,
+      profiSolved: false,
+      profiHint: null
+    };
+
+    // ==========================================
+    // INTERAKTIONS-LOGIK
+    // ==========================================
+    function toggleCheatSheet(open) {
+      const overlay = document.getElementById("cheatsheet-overlay");
+      if (open) {
+        overlay.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+      } else {
+        overlay.classList.add("hidden");
+        document.body.style.overflow = "";
+      }
+    }
+
+    function showToast(msg) {
+      const box = document.getElementById("toast-box");
+      const content = document.getElementById("toast-content");
+      content.textContent = msg;
+      box.classList.remove("opacity-0", "translate-y-2");
+      box.classList.add("opacity-100", "translate-y-0");
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        box.classList.remove("opacity-100", "translate-y-0");
+        box.classList.add("opacity-0", "translate-y-2");
+      }, 2600);
+    }
+
+    function startDay() {
+      state.screen = "station";
+      state.currentIndex = 0;
+      resetStationState();
+      render();
+    }
+
+    function resetStationState() {
+      state.step1Choice = null;
+      state.step2Choice = null;
+      state.attempts = 0;
+      state.solved = false;
+      state.feedbackHint = null;
+      state.tipOpen = false;
+    }
+
+    function selectStep1(choice) {
+      if (state.solved) return;
+      state.step1Choice = choice;
+      render();
+    }
+
+    function selectStep2(paraId) {
+      if (state.solved) return;
+      state.step2Choice = paraId;
+      render();
+    }
+
+    function toggleTip() {
+      state.tipOpen = !state.tipOpen;
+      render();
+    }
+
+    function evaluateStation() {
+      const station = STATIONS[state.currentIndex];
+      if (!state.step1Choice || !state.step2Choice) {
+        showToast("Bitte wähle zuerst (1) Rechtens/Unzulässig und (2) das Stichwort aus!");
+        return;
+      }
+
+      state.attempts += 1;
+      const verdictCorrect = state.step1Choice === station.correctVerdict;
+      const chosenParaObj = station.paragraphs.find(p => p.id === state.step2Choice);
+      const paraCorrect = chosenParaObj && chosenParaObj.isCorrect;
+
+      if (verdictCorrect && paraCorrect) {
+        state.solved = true;
+        state.feedbackHint = null;
+
+        const firstTry = state.attempts === 1;
+        const pointsEarned = firstTry ? 2 : 1;
+
+        if (!state.results[station.id]) {
+          state.score += pointsEarned;
+          state.results[station.id] = {
+            firstTry,
+            pointsEarned
+          };
+        }
+      } else {
+        // Zwei-Stufen-Fehlerfeedback: Lösung NICHT vorwegnehmen!
+        if (!verdictCorrect && !paraCorrect) {
+          state.feedbackHint = "Beides passt noch nicht ganz: Prüfe zuerst, ob hier gegen eine Pflicht verstoßen wird oder alles rechtens ist, und suche dann im Cheat-Sheet das passende Stichwort samt Paragraphen.";
+        } else if (!verdictCorrect && paraCorrect) {
+          state.feedbackHint = `Dein Stichwort (${chosenParaObj.keyword} – ${chosenParaObj.paraCode}) stimmt schon genau! Schau dir aber Schritt 1 noch einmal an: Ist die Situation im Fall rechtens oder unzulässig?`;
+        } else if (verdictCorrect && chosenParaObj && chosenParaObj.trapType === "wrongKeyword") {
+          state.feedbackHint = `Schritt 1 stimmt und auch der Paragraph am Ende (${chosenParaObj.paraCode}) passt – aber schau genau auf das Stichwort am Anfang! Passt „${chosenParaObj.keyword}“ wirklich zum Inhalt von ${chosenParaObj.paraCode} im Cheat-Sheet?`;
+        } else if (verdictCorrect && chosenParaObj && chosenParaObj.trapType === "wrongParaSameKeyword") {
+          state.feedbackHint = `Schritt 1 stimmt und auch das Stichwort „${chosenParaObj.keyword}“ am Anfang passt zum Thema – aber schau genau auf den Paragraphen am Ende! Steht die Pflicht des Betriebs wirklich in ${chosenParaObj.paraCode}?`;
+        } else {
+          state.feedbackHint = `Schritt 1 (Rechtens / Unzulässig) stimmt schon! Bei Schritt 2 passt das ausgewählte Stichwort aber noch nicht – öffne das BBiG-Cheat-Sheet und suche die passende Pflicht oder Schutzvorschrift.`;
+        }
+      }
+
+      render();
+    }
+
+    function nextStep() {
+      if (state.currentIndex < STATIONS.length - 1) {
+        state.currentIndex += 1;
+        resetStationState();
+      } else {
+        state.screen = "profi";
+        state.profiChoiceA = null;
+        state.profiChoiceB = null;
+        state.profiAttempts = 0;
+        state.profiSolved = false;
+        state.profiHint = null;
+        state.tipOpen = false;
+      }
+      render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function selectProfiOptionA(optId) {
+      if (state.profiSolved) return;
+      state.profiChoiceA = optId;
+      render();
+    }
+
+    function selectProfiOptionB(optId) {
+      if (state.profiSolved) return;
+      state.profiChoiceB = optId;
+      render();
+    }
+
+    function evaluateProfi() {
+      if (!state.profiChoiceA || !state.profiChoiceB) {
+        showToast("Bitte wähle sowohl für Verstoß A als auch für Verstoß B eine Option aus!");
+        return;
+      }
+
+      state.profiAttempts += 1;
+      const chosenA = PROFI_STATION.stepAOptions.find(o => o.id === state.profiChoiceA);
+      const chosenB = PROFI_STATION.stepBOptions.find(o => o.id === state.profiChoiceB);
+      const aOk = chosenA && chosenA.isCorrect;
+      const bOk = chosenB && chosenB.isCorrect;
+
+      if (aOk && bOk) {
+        state.profiSolved = true;
+        state.profiHint = null;
+
+        const firstTry = state.profiAttempts === 1;
+        const pointsEarned = firstTry ? 2 : 1;
+
+        if (!state.results[PROFI_STATION.id]) {
+          state.score += pointsEarned;
+          state.results[PROFI_STATION.id] = {
+            firstTry,
+            pointsEarned,
+            skipped: false
+          };
+        }
+      } else if (aOk && !bOk) {
+        state.profiHint = "Verstoß A (Mindesturlaub für 16-Jährige) stimmt schon! Schau dir aber Verstoß B noch einmal im BBiG-Cheat-Sheet an: Welches Stichwort verbietet Vereinbarungen zum Nachteil des Azubis und sichert das schriftliche Zeugnis?";
+      } else if (!aOk && bOk) {
+        state.profiHint = "Verstoß B (Unabdingbarkeit & Zeugnispflicht) stimmt schon! Lies aber bei Verstoß A noch einmal genau im Infokasten nach: Lukas ist zu Beginn des Kalenderjahres 16 Jahre alt (also unter 17 Jahren). Wie viele Werktage stehen ihm mindestens zu?";
+      } else {
+        state.profiHint = "Beide Antworten passen noch nicht ganz: Lies bei A im Infokasten den Mindesturlaub für 16-Jährige (unter 17 Jahren) ab und prüfe bei B im BBiG-Cheat-Sheet das Abweichungsverbot (§ 25 BBiG) und die Zeugnispflicht (§ 16 BBiG).";
+      }
+
+      render();
+    }
+
+    function finishProfi() {
+      state.screen = "summary";
+      render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function skipToSummary() {
+      if (!state.results[PROFI_STATION.id]) {
+        state.results[PROFI_STATION.id] = { skipped: true, pointsEarned: 0 };
+      }
+      state.screen = "summary";
+      render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function restartApp() {
+      state.screen = "welcome";
+      state.currentIndex = 0;
+      state.score = 0;
+      state.results = {};
+      resetStationState();
+      render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // ==========================================
+    // RENDER-FUNKTIONEN
+    // ==========================================
+    function renderProgressBar() {
+      const container = document.getElementById("progress-bar-container");
+      document.getElementById("score-display").textContent = state.score;
+
+      const pills = STATIONS.map((st, idx) => {
+        const res = state.results[st.id];
+        const isCurrent = state.screen === "station" && state.currentIndex === idx;
+
+        let pillClass = "bg-slate-100 text-slate-600 border-slate-200";
+        let icon = "";
+        if (res) {
+          pillClass = "bg-emerald-50 text-emerald-800 border-emerald-300";
+          icon = "✓ ";
+        }
+        if (isCurrent) {
+          pillClass = "bg-blue-600 text-white border-blue-600 shadow-xs";
+        }
+
+        return `
+          <span class="px-2 py-1 rounded-lg border text-[11px] font-mono font-semibold transition-all ${pillClass}">
+            ${icon}${st.time.replace(" Uhr", "")}
+          </span>
+        `;
+      }).join("");
+
+      const profiRes = state.results[PROFI_STATION.id];
+      const isProfiCurrent = state.screen === "profi";
+      let profiClass = "bg-slate-100 text-slate-600 border-slate-200";
+      if (profiRes && !profiRes.skipped) {
+        profiClass = "bg-amber-50 text-amber-800 border-amber-300";
+      }
+      if (isProfiCurrent) {
+        profiClass = "bg-amber-500 text-white border-amber-500 shadow-xs";
+      }
+
+      container.innerHTML = `
+        ${pills}
+        <span class="px-2 py-1 rounded-lg border text-[11px] font-semibold transition-all ${profiClass}">
+          ★ 17:15
+        </span>
+      `;
+    }
+
+    function renderWelcome() {
+      return `
+        <div class="animate-card max-w-4xl mx-auto bg-white border border-slate-200 rounded-3xl p-6 sm:p-10 shadow-lg">
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 items-center">
+            
+            <!-- Text & Mission -->
+            <div class="md:col-span-7 space-y-4">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold">
+                <span>⚖️</span> Wirtschaft &amp; Recht 9 • Realschule Bayern (WR9 1.2)
+              </div>
+              <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                Ein Tag bei <span class="text-blue-600">TechSolutions</span>
+              </h1>
+              <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+                Begleite <strong>Lukas Weber</strong> (16, Azubi zum Fachinformatiker) chronologisch von <strong>07:15 Uhr bis 17:15 Uhr</strong> durch seinen Ausbildungstag. Prüfe mithilfe des <strong>BBiG-Cheat-Sheets</strong> jede Situation und wähle das passende <strong>Fach-Stichwort</strong> samt Paragraf aus!
+              </p>
+
+              <!-- Legende der Farbcodes -->
+              <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2.5">
+                <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Dein BBiG-Cheat-Sheet (oben rechts):</p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-medium">
+                  <div class="flex items-center gap-2 p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 shrink-0"></span>
+                    <span><strong>Grün:</strong> Pflichten Azubi (§ 13)</span>
+                  </div>
+                  <div class="flex items-center gap-2 p-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-900">
+                    <span class="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0"></span>
+                    <span><strong>Blau:</strong> Pflichten Betrieb (§§ 14–16)</span>
+                  </div>
+                  <div class="flex items-center gap-2 p-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-900">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-600 shrink-0"></span>
+                    <span><strong>Orange:</strong> Schutz (§§ 17, 25)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pt-2 flex flex-col sm:flex-row gap-3">
+                <button onclick="startDay()" class="touch-btn flex-1 sm:flex-initial inline-flex items-center justify-center gap-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-base px-7 py-3.5 rounded-2xl shadow-md shadow-blue-600/20 transition-all cursor-pointer">
+                  <span>Tag starten (07:15 Uhr)</span>
+                  <span>→</span>
+                </button>
+                <button onclick="toggleCheatSheet(true)" class="touch-btn inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-sm px-5 py-3.5 rounded-2xl border border-slate-300 transition-all cursor-pointer">
+                  <span>📖</span>
+                  <span>Cheat-Sheet öffnen</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Illustration Lukas Welcome -->
+            <div class="md:col-span-5">
+              <div class="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-3">
+                <svg viewBox="0 0 320 280" class="w-full h-auto rounded-xl" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="320" height="280" fill="#FFFBEB"/>
+                  <circle cx="160" cy="145" r="95" fill="#FEF3C7"/>
+                  <!-- ID Badge -->
+                  <rect x="74" y="20" width="172" height="32" rx="8" fill="#FFFFFF" stroke="#3B82F6" stroke-width="2"/>
+                  <text x="160" y="40" text-anchor="middle" fill="#1D4ED8" font-family="monospace" font-size="11" font-weight="bold">AZUBI • LUKAS WEBER</text>
+                  
+                  <!-- Lukas Figur -->
+                  <g transform="translate(85, 68)">
+                    <!-- Oberkörper blauer Hoodie -->
+                    <path d="M10 212 C10 144, 140 144, 140 212 Z" fill="#2563EB" stroke="#1E293B" stroke-width="2.5" stroke-linejoin="round"/>
+                    <!-- Flächiger, geschlossener Hals-Block ohne Doppelstriche -->
+                    <path d="M61 118 L89 118 L90 155 L60 155 Z" fill="#F6C39E"/>
+                    <path d="M61 118 L60 152 M89 118 L90 152" fill="none" stroke="#1E293B" stroke-width="2.4" stroke-linecap="round"/>
+                    <!-- Geschlossener Hoodie-Kragen -->
+                    <path d="M47 148 Q75 172 103 148 Q75 157 47 148 Z" fill="#1D4ED8" stroke="#1E293B" stroke-width="2.3" stroke-linejoin="round"/>
+                    <!-- Ausweis am Lanyard -->
+                    <rect x="63" y="180" width="24" height="28" rx="4" fill="#FFFFFF" stroke="#1E293B" stroke-width="1.8"/>
+                    <rect x="67" y="185" width="16" height="9" rx="2" fill="#3B82F6"/>
+                    <!-- Runde Ohren -->
+                    <circle cx="38" cy="84" r="10" fill="#F6C39E" stroke="#1E293B" stroke-width="2.5"/>
+                    <circle cx="112" cy="84" r="10" fill="#F6C39E" stroke="#1E293B" stroke-width="2.5"/>
+                    <!-- Gesicht -->
+                    <rect x="40" y="36" width="70" height="86" rx="34" fill="#F6C39E" stroke="#1E293B" stroke-width="2.5"/>
+                    <!-- Ordentliche jugendliche braune Frisur -->
+                    <path d="M37 74 C34 38, 56 22, 84 24 C102 25, 116 40, 113 74 C110 56, 102 48, 88 47 C72 46, 58 53, 48 50 C41 48, 39 60, 37 74 Z" fill="#6B3E26" stroke="#1E293B" stroke-width="2.5" stroke-linejoin="round"/>
+                    <path d="M62 30 Q76 35 86 29" fill="none" stroke="#4A2816" stroke-width="2.2" stroke-linecap="round"/>
+                    <!-- Augenbrauen -->
+                    <path d="M53 66 Q61 62 68 66" fill="none" stroke="#1E293B" stroke-width="2.8" stroke-linecap="round"/>
+                    <path d="M82 66 Q89 62 97 66" fill="none" stroke="#1E293B" stroke-width="2.8" stroke-linecap="round"/>
+                    <!-- Freundliche Augen -->
+                    <circle cx="61" cy="76" r="4" fill="#1E293B"/>
+                    <circle cx="89" cy="76" r="4" fill="#1E293B"/>
+                    <!-- Nase -->
+                    <path d="M75 78 L72 88 L77 88" fill="none" stroke="#1E293B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <!-- Freundliches Lächeln -->
+                    <path d="M62 98 Q75 109 88 98" fill="none" stroke="#1E293B" stroke-width="2.8" stroke-linecap="round"/>
+                  </g>
+                </svg>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      `;
+    }
+
+    function renderStation() {
+      const s = STATIONS[state.currentIndex];
+      const displayParagraphs = getShuffledArray(s.paragraphs, s.id * 19 + 5);
+
+      return `
+        <div class="animate-card space-y-4 sm:space-y-5">
+          
+          <!-- Obere Status-Leiste der Station -->
+          <div class="flex flex-wrap items-center justify-between gap-2 bg-white border border-slate-200 px-4 py-3 rounded-2xl shadow-xs">
+            <div class="flex items-center gap-2.5">
+              <span class="font-mono font-bold text-sm sm:text-base bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1 rounded-xl">
+                🕒 ${s.time}
+              </span>
+              <span class="text-xs sm:text-sm font-semibold text-slate-700">${s.badge}</span>
+            </div>
+            <span class="text-xs text-slate-500 flex items-center gap-1.5">
+              <span>📍</span> ${s.location}
+            </span>
+          </div>
+
+          <!-- Hauptgrid: Links Illustration & Tipp, Rechts Fall-Check-Interaktion -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start">
+            
+            <!-- LINKE SPALTE (5/12): Bild & Tipp-Button -->
+            <div class="lg:col-span-5 space-y-4">
+              <div class="bg-white border border-slate-200 rounded-3xl p-3 shadow-sm">
+                <div class="aspect-[16/10] w-full overflow-hidden rounded-2xl border border-slate-200">
+                  ${s.svgIllustration}
+                </div>
+                <div class="mt-3 px-1 flex items-center justify-between text-xs text-slate-500 font-medium">
+                  <span>Station ${s.id} von ${STATIONS.length}</span>
+                  <span class="font-mono text-blue-600">TechSolutions GmbH</span>
+                </div>
+              </div>
+
+              <!-- Differenzierung: Tipp-Button -->
+              <div class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-xs">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs font-semibold text-slate-600">Hilfe beim Suchen im Gesetz?</span>
+                  <button onclick="toggleTip()" class="touch-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 transition-colors cursor-pointer">
+                    <span>💡</span>
+                    <span>${state.tipOpen ? "Tipp ausblenden" : "Tipp anzeigen"}</span>
+                  </button>
+                </div>
+                ${state.tipOpen ? `
+                  <div class="mt-2.5 p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs sm:text-sm text-amber-950 font-medium leading-relaxed">
+                    ${s.tipText}
+                  </div>
+                ` : ""}
+              </div>
+            </div>
+
+            <!-- RECHTE SPALTE (7/12): Fallbeschreibung & Fall-Check-Modus -->
+            <div class="lg:col-span-7 space-y-4">
+              
+              <!-- Szenario-Karte -->
+              <div class="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-3">
+                <h2 class="text-lg sm:text-2xl font-bold text-slate-900">${s.title}</h2>
+                
+                <!-- Dialog / Situations-Box -->
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-1.5">
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="font-bold text-blue-700">${s.sceneSender}</span>
+                    <span class="text-slate-500">${s.sceneChannel}</span>
+                  </div>
+                  <p class="text-slate-800 text-sm sm:text-base leading-relaxed font-medium">
+                    ${s.sceneText}
+                  </p>
+                </div>
+
+                <p class="text-xs text-slate-600 font-medium flex items-center gap-1.5">
+                  <span class="text-blue-600 font-bold">ℹ</span> ${s.contextNote}
+                </p>
+              </div>
+
+              <!-- FALL-CHECK-MODUS (2 Schritte) -->
+              <div class="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-5">
+                
+                <!-- Schritt 1: Rechtens / zulässig vs. Unzulässig / Verstoß -->
+                <div class="space-y-2.5">
+                  <div class="flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">1</span>
+                    <h3 class="font-bold text-sm sm:text-base text-slate-900">1. Bewertung: Rechtens oder unzulässig?</h3>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button onclick="selectStep1('allowed')" ${state.solved ? "disabled" : ""} class="touch-btn p-3.5 sm:p-4 rounded-2xl border-2 text-left transition-all flex items-center gap-3 cursor-pointer ${
+                      state.step1Choice === 'allowed'
+                        ? 'bg-emerald-50 border-emerald-500 text-emerald-950 shadow-xs'
+                        : 'bg-slate-50 border-slate-200 hover:border-slate-400 text-slate-800'
+                    } ${state.solved ? 'cursor-default' : ''}">
+                      <span class="text-xl">✅</span>
+                      <div class="font-bold text-sm sm:text-base">Rechtens / zulässig</div>
+                    </button>
+
+                    <button onclick="selectStep1('forbidden')" ${state.solved ? "disabled" : ""} class="touch-btn p-3.5 sm:p-4 rounded-2xl border-2 text-left transition-all flex items-center gap-3 cursor-pointer ${
+                      state.step1Choice === 'forbidden'
+                        ? 'bg-rose-50 border-rose-500 text-rose-950 shadow-xs'
+                        : 'bg-slate-50 border-slate-200 hover:border-slate-400 text-slate-800'
+                    } ${state.solved ? 'cursor-default' : ''}">
+                      <span class="text-xl">🚫</span>
+                      <div class="font-bold text-sm sm:text-base">Unzulässig / Verstoß</div>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Schritt 2: Stichwort zuerst, Paragraph am Ende -->
+                <div class="space-y-2.5 pt-3 border-t border-slate-100">
+                  <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                      <span class="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">2</span>
+                      <h3 class="font-bold text-sm sm:text-base text-slate-900">Passende Pflicht / Schutzvorschrift auswählen:</h3>
+                    </div>
+                    <button onclick="toggleCheatSheet(true)" class="text-xs text-blue-600 hover:text-blue-800 underline font-semibold cursor-pointer">
+                      📖 Cheat-Sheet öffnen
+                    </button>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    ${displayParagraphs.map(p => {
+                      const isSelected = state.step2Choice === p.id;
+
+                      let btnStyle = "bg-slate-50 border-slate-200 hover:border-slate-400 text-slate-800";
+                      if (state.solved) {
+                        if (p.isCorrect) {
+                          btnStyle = "bg-emerald-50 border-emerald-500 text-emerald-950";
+                        } else {
+                          btnStyle = "bg-slate-50/50 border-slate-200 text-slate-400";
+                        }
+                      } else if (isSelected) {
+                        btnStyle = "bg-blue-50 border-blue-600 text-blue-950 shadow-xs";
+                      }
+
+                      return `
+                        <button onclick="selectStep2('${p.id}')" ${state.solved ? "disabled" : ""} class="touch-btn p-3.5 rounded-xl border-2 text-left transition-all cursor-pointer flex flex-col justify-between gap-1.5 ${btnStyle}">
+                          <div class="font-bold text-xs sm:text-sm leading-snug">
+                            ${p.keyword}
+                          </div>
+                          <div>
+                            <span class="inline-block font-mono text-[11px] font-semibold px-2 py-0.5 rounded-md ${state.solved && p.isCorrect ? 'bg-emerald-200/80 text-emerald-900' : (isSelected ? 'bg-blue-100 text-blue-800' : 'bg-slate-200/80 text-slate-600')}">
+                              (${p.paraCode})
+                            </span>
+                          </div>
+                        </button>
+                      `;
+                    }).join("")}
+                  </div>
+                </div>
+
+                <!-- Hilfe-Hinweis bei falschem Versuch (verrät NICHT die Lösung!) -->
+                ${!state.solved && state.feedbackHint ? `
+                  <div class="p-4 rounded-2xl bg-amber-50 border-2 border-amber-400 text-amber-950 flex items-start gap-3">
+                    <span class="text-xl leading-none">🔎</span>
+                    <div class="space-y-1">
+                      <div class="font-bold text-xs sm:text-sm text-amber-900">Noch nicht ganz – schau noch einmal genau hin:</div>
+                      <p class="text-xs sm:text-sm leading-relaxed">${state.feedbackHint}</p>
+                    </div>
+                  </div>
+                ` : ""}
+
+                <!-- Prüfen-Button oder Auflösungs-Box -->
+                ${!state.solved ? `
+                  <div class="pt-1">
+                    <button onclick="evaluateStation()" class="touch-btn w-full py-3.5 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm sm:text-base shadow-md shadow-blue-600/20 transition-all cursor-pointer">
+                      ${state.attempts > 0 ? "Erneut prüfen ✓" : "Antwort prüfen ✓"}
+                    </button>
+                  </div>
+                ` : `
+                  <div class="pt-1 space-y-4">
+                    <div class="p-4 rounded-2xl border-2 bg-emerald-50 border-emerald-400 text-emerald-950">
+                      <div class="flex items-start gap-3">
+                        <span class="text-2xl leading-none">🎉</span>
+                        <div class="space-y-1">
+                          <div class="flex flex-wrap items-center gap-2">
+                            <span class="font-bold text-sm sm:text-base">${s.resolutionTitle}</span>
+                            <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-emerald-200/80 text-emerald-900">
+                              +${state.results[s.id].pointsEarned} Pkt.
+                            </span>
+                          </div>
+                          <p class="text-xs sm:text-sm opacity-90 leading-relaxed">${s.resolutionText}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button onclick="nextStep()" class="touch-btn w-full py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm sm:text-base shadow-md shadow-emerald-600/20 transition-all cursor-pointer flex items-center justify-center gap-2">
+                      <span>${state.currentIndex < STATIONS.length - 1 ? "Weiter zur nächsten Station" : "Weiter zum ★ Profi-Check (17:15 Uhr)"}</span>
+                      <span>→</span>
+                    </button>
+                  </div>
+                `}
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+      `;
+    }
+
+    function renderProfiCheck() {
+      const p = PROFI_STATION;
+      const res = state.results[p.id];
+      const displayOptionsA = getShuffledArray(p.stepAOptions, 71);
+      const displayOptionsB = getShuffledArray(p.stepBOptions, 93);
+
+      return `
+        <div class="animate-card max-w-5xl mx-auto space-y-4 sm:space-y-5">
+          
+          <!-- Banner -->
+          <div class="flex flex-wrap items-center justify-between gap-2 bg-amber-50 border border-amber-300 px-4 py-3 rounded-2xl shadow-xs">
+            <div class="flex items-center gap-2.5">
+              <span class="font-mono font-bold text-sm bg-amber-500 text-white px-3 py-1 rounded-xl">
+                🕒 ${p.time}
+              </span>
+              <span class="text-xs sm:text-sm font-bold text-amber-900">${p.badge}</span>
+            </div>
+            <button onclick="skipToSummary()" class="text-xs text-slate-600 hover:text-slate-900 underline font-medium cursor-pointer">
+              Überspringen &amp; zur Auswertung →
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start">
+            
+            <!-- LINKE SPALTE: Infokasten zum Urlaubsanspruch + Illustration + Tipp -->
+            <div class="lg:col-span-5 space-y-4">
+              
+              <!-- INFOKASTEN: Gesetzlicher Mindesturlaub für Auszubildende -->
+              <div class="bg-blue-50 border-2 border-blue-300 rounded-3xl p-4 sm:p-5 shadow-sm space-y-2.5">
+                <div class="flex items-center gap-2">
+                  <span class="text-xl">🌴</span>
+                  <h3 class="font-extrabold text-sm sm:text-base text-blue-950">Infokasten: Urlaub für Auszubildende</h3>
+                </div>
+                <p class="text-xs text-blue-900 leading-relaxed">
+                  Damit Jugendliche während der Ausbildung genug Erholung bekommen, legt das Gesetz einen <strong>Mindesturlaub pro Kalenderjahr</strong> fest (entscheidend ist das Alter zu Beginn des Kalenderjahres):
+                </p>
+                <div class="bg-white border border-blue-200 rounded-2xl p-3 space-y-1.5 text-xs sm:text-sm">
+                  <div class="flex items-center justify-between py-1 border-b border-slate-100">
+                    <span class="text-slate-700 font-medium">unter 16 Jahren (z. B. 15 J.):</span>
+                    <span class="font-mono font-bold text-blue-800 bg-blue-50 px-2 py-0.5 rounded">mind. 30 Werktage</span>
+                  </div>
+                  <div class="flex items-center justify-between py-1 border-b border-slate-100">
+                    <span class="text-slate-700 font-medium">unter 17 Jahren (z. B. 16 J.):</span>
+                    <span class="font-mono font-bold text-blue-800 bg-blue-50 px-2 py-0.5 rounded">mind. 27 Werktage</span>
+                  </div>
+                  <div class="flex items-center justify-between py-1">
+                    <span class="text-slate-700 font-medium">unter 18 Jahren (z. B. 17 J.):</span>
+                    <span class="font-mono font-bold text-blue-800 bg-blue-50 px-2 py-0.5 rounded">mind. 25 Werktage</span>
+                  </div>
+                </div>
+                <p class="text-[11px] text-blue-800">
+                  <em>Hinweis: Werktage sind alle Kalendertage außer Sonn- und gesetzliche Feiertage (Montag bis Samstag = 6 Werktage pro Woche).</em>
+                </p>
+              </div>
+
+              <!-- Illustration -->
+              <div class="bg-white border border-slate-200 rounded-3xl p-3 shadow-sm">
+                <div class="aspect-[16/10] w-full overflow-hidden rounded-2xl border border-slate-200">
+                  ${p.svgIllustration}
+                </div>
+              </div>
+
+              <!-- Tipp-Button -->
+              <div class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-xs">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs font-semibold text-slate-600">Hilfe für den Profi-Check:</span>
+                  <button onclick="toggleTip()" class="touch-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 transition-colors cursor-pointer">
+                    <span>💡</span>
+                    <span>${state.tipOpen ? "Tipp ausblenden" : "Tipp anzeigen"}</span>
+                  </button>
+                </div>
+                ${state.tipOpen ? `
+                  <div class="mt-2.5 p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs sm:text-sm text-amber-950 font-medium">
+                    ${p.tipText}
+                  </div>
+                ` : ""}
+              </div>
+            </div>
+
+            <!-- RECHTE SPALTE: Fallbeschreibung & Zwei-Schritte-Auswahl -->
+            <div class="lg:col-span-7 bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-5">
+              <div class="space-y-2">
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900">${p.title}</h2>
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm sm:text-base text-slate-800 font-medium leading-relaxed">
+                  ${p.sceneText}
+                </div>
+                <p class="text-xs text-slate-600 font-medium flex items-center gap-1.5">
+                  <span class="text-amber-600 font-bold">ℹ</span> ${p.contextNote}
+                </p>
+              </div>
+
+              <!-- Verstoß A -->
+              <div class="space-y-2">
+                <div class="flex items-center gap-2">
+                  <span class="w-6 h-6 rounded-full bg-amber-500 text-white text-xs font-bold flex items-center justify-center">A</span>
+                  <h3 class="font-bold text-xs sm:text-sm text-slate-900">Verstoß A (Nur 22 Werktage Jahresurlaub für den 16-jährigen Lukas):</h3>
+                </div>
+                <div class="space-y-2">
+                  ${displayOptionsA.map(opt => {
+                    const isSelected = state.profiChoiceA === opt.id;
+                    let style = "bg-slate-50 border-slate-200 hover:border-slate-400 text-slate-800";
+                    if (state.profiSolved) {
+                      style = opt.isCorrect
+                        ? "bg-emerald-50 border-emerald-500 text-emerald-950"
+                        : "bg-slate-50/50 border-slate-200 text-slate-400";
+                    } else if (isSelected) {
+                      style = "bg-blue-50 border-blue-600 text-blue-950";
+                    }
+
+                    return `
+                      <button onclick="selectProfiOptionA('${opt.id}')" ${state.profiSolved ? "disabled" : ""} class="touch-btn w-full p-3.5 rounded-xl border-2 text-left transition-all cursor-pointer flex flex-wrap items-center justify-between gap-2 ${style}">
+                        <span class="font-bold text-xs sm:text-sm">${opt.keyword}</span>
+                        <span class="font-mono text-[11px] font-semibold px-2 py-0.5 rounded-md bg-slate-200/80 text-slate-700">(${opt.paraCode})</span>
+                      </button>
+                    `;
+                  }).join("")}
+                </div>
+              </div>
+
+              <!-- Verstoß B -->
+              <div class="space-y-2 pt-3 border-t border-slate-100">
+                <div class="flex items-center gap-2">
+                  <span class="w-6 h-6 rounded-full bg-amber-500 text-white text-xs font-bold flex items-center justify-center">B</span>
+                  <h3 class="font-bold text-xs sm:text-sm text-slate-900">Verstoß B (Schriftlicher Verzicht auf das Ausbildungszeugnis):</h3>
+                </div>
+                <div class="space-y-2">
+                  ${displayOptionsB.map(opt => {
+                    const isSelected = state.profiChoiceB === opt.id;
+                    let style = "bg-slate-50 border-slate-200 hover:border-slate-400 text-slate-800";
+                    if (state.profiSolved) {
+                      style = opt.isCorrect
+                        ? "bg-emerald-50 border-emerald-500 text-emerald-950"
+                        : "bg-slate-50/50 border-slate-200 text-slate-400";
+                    } else if (isSelected) {
+                      style = "bg-blue-50 border-blue-600 text-blue-950";
+                    }
+
+                    return `
+                      <button onclick="selectProfiOptionB('${opt.id}')" ${state.profiSolved ? "disabled" : ""} class="touch-btn w-full p-3.5 rounded-xl border-2 text-left transition-all cursor-pointer flex flex-wrap items-center justify-between gap-2 ${style}">
+                        <span class="font-bold text-xs sm:text-sm">${opt.keyword}</span>
+                        <span class="font-mono text-[11px] font-semibold px-2 py-0.5 rounded-md bg-slate-200/80 text-slate-700">(${opt.paraCode})</span>
+                      </button>
+                    `;
+                  }).join("")}
+                </div>
+              </div>
+
+              <!-- Hilfe-Hinweis bei falschem Profi-Versuch -->
+              ${!state.profiSolved && state.profiHint ? `
+                <div class="p-4 rounded-2xl bg-amber-50 border-2 border-amber-400 text-amber-950 flex items-start gap-3">
+                  <span class="text-xl leading-none">🔎</span>
+                  <div class="space-y-1">
+                    <div class="font-bold text-xs sm:text-sm text-amber-900">Noch nicht ganz – schau noch einmal genau hin:</div>
+                    <p class="text-xs sm:text-sm leading-relaxed">${state.profiHint}</p>
+                  </div>
+                </div>
+              ` : ""}
+
+              ${!state.profiSolved ? `
+                <button onclick="evaluateProfi()" class="touch-btn w-full py-3.5 px-6 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-sm sm:text-base shadow-md transition-all cursor-pointer">
+                  ${state.profiAttempts > 0 ? "Profi-Antwort erneut prüfen ★" : "Profi-Antwort prüfen ★"}
+                </button>
+              ` : `
+                <div class="space-y-4">
+                  <div class="p-4 rounded-2xl border-2 bg-emerald-50 border-emerald-400 text-emerald-950">
+                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                      <span class="font-bold text-sm sm:text-base">${p.resolutionTitle}</span>
+                      <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-emerald-200/80 text-emerald-900">
+                        +${res ? res.pointsEarned : 2} Pkt.
+                      </span>
+                    </div>
+                    <p class="text-xs sm:text-sm opacity-90 leading-relaxed">${p.resolutionText}</p>
+                  </div>
+
+                  <button onclick="finishProfi()" class="touch-btn w-full py-3.5 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm sm:text-base shadow-md transition-all cursor-pointer">
+                    Zum BBiG-Einsatzbericht (Auswertung) →
+                  </button>
+                </div>
+              `}
+            </div>
+
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSummary() {
+      const maxPoints = (STATIONS.length + 1) * 2;
+      const percentage = Math.round((state.score / maxPoints) * 100);
+
+      let badgeTitle = "BBiG-Rechtsprofi bei TechSolutions";
+      let badgeDesc = "Du kennst die Rechte und Pflichten im Ausbildungsalltag sicher und lässt dich nicht überrumpeln.";
+      if (percentage < 55) {
+        badgeTitle = "BBiG-Einsteiger mit Luft nach oben";
+        badgeDesc = "Du hast alle Stationen durchgearbeitet – schau dir die Stichworte und Paragrafen im Merkkasten unten noch einmal genau an.";
+      } else if (percentage < 85) {
+        badgeTitle = "Sicherer BBiG-Kenner";
+        badgeDesc = "Starke Leistung! Du kannst fast alle Situationen im Ausbildungsbetrieb sauber rechtlich einordnen.";
+      }
+
+      return `
+        <div class="animate-card max-w-4xl mx-auto space-y-6">
+          
+          <!-- Ergebnis-Header -->
+          <div class="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-lg text-center space-y-4">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-50 border-2 border-amber-300 text-3xl shadow-xs">
+              🏆
+            </div>
+            <div>
+              <span class="text-xs font-mono uppercase tracking-wider text-blue-600 font-bold">Tages-Check abgeschlossen</span>
+              <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">${badgeTitle}</h1>
+              <p class="text-slate-600 text-sm max-w-xl mx-auto mt-2">${badgeDesc}</p>
+            </div>
+
+            <div class="inline-flex items-center gap-4 bg-slate-50 border border-slate-200 px-6 py-3 rounded-2xl">
+              <div class="text-left">
+                <div class="text-xs text-slate-500 font-medium">Gesamtpunktzahl</div>
+                <div class="text-2xl sm:text-3xl font-mono font-extrabold text-amber-600">${state.score} <span class="text-base text-slate-400">/ ${maxPoints} Pkt.</span></div>
+              </div>
+              <div class="h-10 w-px bg-slate-200"></div>
+              <div class="text-left">
+                <div class="text-xs text-slate-500 font-medium">Trefferquote</div>
+                <div class="text-2xl sm:text-3xl font-mono font-extrabold text-emerald-600">${percentage}%</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rein fachlicher Merkkasten (inkl. Urlaubsanspruch für Auszubildende) -->
+          <div class="bg-blue-50 border-2 border-blue-200 rounded-3xl p-5 sm:p-6 shadow-xs space-y-3">
+            <div class="flex items-center gap-2.5">
+              <span class="text-2xl">⚖️</span>
+              <h2 class="font-extrabold text-base sm:text-lg text-blue-950">⚖ Merkkasten: Rechte &amp; Pflichten im BBiG (Spiegelbild-Prinzip)</h2>
+            </div>
+            <p class="text-xs sm:text-sm text-blue-900 leading-relaxed">
+              <strong>Spiegelbild-Prinzip:</strong> Ein Berufsausbildungsvertrag ist keine Einbahnstraße. Jede Pflicht der einen Seite ist zugleich ein Recht der anderen Seite – so bleibt die Waage im Gleichgewicht.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs sm:text-sm">
+              <div class="bg-white border border-emerald-200 rounded-2xl p-3.5 space-y-1.5">
+                <div class="font-bold text-emerald-800">Pflichten des Auszubildenden</div>
+                <ul class="list-disc pl-4 text-slate-700 space-y-1 text-xs">
+                  <li><strong>Lern- &amp; Sorgfaltspflicht</strong> (§ 13 Nr. 1 BBiG)</li>
+                  <li><strong>Weisungsgebundenheit</strong> (§ 13 Nr. 3 BBiG)</li>
+                  <li><strong>Ausbildungsmittel pfleglich behandeln</strong> (§ 13 Nr. 5 BBiG)</li>
+                  <li><strong>Schweigepflicht</strong> über Betriebsgeheimnisse (§ 13 Nr. 6 BBiG)</li>
+                  <li><strong>Ausbildungsnachweis führen</strong> (§ 13 Nr. 7 BBiG)</li>
+                </ul>
+              </div>
+              <div class="bg-white border border-blue-200 rounded-2xl p-3.5 space-y-1.5">
+                <div class="font-bold text-blue-800">Pflichten des Ausbilders</div>
+                <ul class="list-disc pl-4 text-slate-700 space-y-1 text-xs">
+                  <li><strong>Ausbildungspflicht &amp; Ausbildungszweck</strong> (§ 14 Abs. 1, 3 BBiG)</li>
+                  <li><strong>Ausbildungsmittel kostenlos stellen</strong> (§ 14 Abs. 1 Nr. 3 BBiG)</li>
+                  <li><strong>Ausbildungsnachweis</strong> ermöglichen &amp; durchsehen (§ 14 Abs. 2 BBiG)</li>
+                  <li><strong>Freistellung (vor 9 Uhr)</strong> (§ 15 Abs. 1 BBiG)</li>
+                  <li><strong>Zeugnispflicht</strong> (§ 16 BBiG)</li>
+                </ul>
+              </div>
+              <div class="bg-white border border-amber-200 rounded-2xl p-3.5 space-y-1.5">
+                <div class="font-bold text-amber-800">Schutz &amp; Mindesturlaub</div>
+                <ul class="list-disc pl-4 text-slate-700 space-y-1 text-xs">
+                  <li><strong>Vergütungspflicht:</strong> Angemessene, steigende Vergütung; kein Strafabzug (§ 17 BBiG)</li>
+                  <li><strong>Unabdingbarkeit / Abweichungen:</strong> Vereinbarungen zum Nachteil des Azubis sind nichtig (§ 25 BBiG)</li>
+                  <li><strong>Mindesturlaub für minderjährige Azubis:</strong> mind. 30 Werktage (unter 16 J.), <strong>27 Werktage</strong> (unter 17 J.), 25 Werktage (unter 18 J.)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Übersicht aller 6 Fälle + Profi-Check -->
+          <div class="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-3">
+            <h3 class="font-bold text-base sm:text-lg text-slate-900">Alle Situationen im Überblick</h3>
+            <div class="space-y-2.5">
+              ${STATIONS.map(st => {
+                const res = state.results[st.id];
+                const correctPara = st.paragraphs.find(p => p.isCorrect);
+                return `
+                  <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div class="space-y-0.5">
+                      <div class="flex flex-wrap items-center gap-2">
+                        <span class="font-mono text-xs font-bold text-blue-700">${st.time}</span>
+                        <span class="font-bold text-sm text-slate-900">${st.title}</span>
+                      </div>
+                      <p class="text-xs text-slate-600">
+                        Ergebnis: <strong class="text-slate-900">${st.correctVerdict === 'allowed' ? 'Rechtens / zulässig' : 'Unzulässig / Verstoß'}</strong> • 
+                        Stichwort: <span class="text-blue-700 font-semibold">${correctPara.keyword} (${correctPara.paraCode})</span>
+                      </p>
+                    </div>
+                    <div class="shrink-0">
+                      <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-mono font-bold ${res && res.firstTry ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                        +${res ? res.pointsEarned : 0} Pkt.
+                      </span>
+                    </div>
+                  </div>
+                `;
+              }).join("")}
+
+              <!-- Profi-Check Zeile -->
+              <div class="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div class="space-y-0.5">
+                  <div class="flex items-center gap-2">
+                    <span class="font-mono text-xs font-bold text-amber-700">★ 17:15 Uhr</span>
+                    <span class="font-bold text-sm text-slate-900">${PROFI_STATION.title}</span>
+                  </div>
+                  <p class="text-xs text-slate-700">
+                    Ergebnis: <span class="text-amber-800 font-semibold">Mindesturlaub für 16-Jährige: mind. 27 Werktage &amp; Unabdingbarkeit / Zeugnispflicht (§ 25 BBiG i. V. m. § 16 BBiG)</span>
+                  </p>
+                </div>
+                <div class="shrink-0">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-amber-100 text-amber-900">
+                    ${state.results[PROFI_STATION.id] && !state.results[PROFI_STATION.id].skipped ? `+${state.results[PROFI_STATION.id].pointsEarned} Pkt.` : 'Übersprungen'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Aktionen unten -->
+          <div class="flex flex-col sm:flex-row justify-center gap-3 pb-4">
+            <button onclick="restartApp()" class="touch-btn px-6 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm sm:text-base shadow-md transition-all cursor-pointer">
+              ↻ Tag noch einmal durchspielen
+            </button>
+            <button onclick="toggleCheatSheet(true)" class="touch-btn px-6 py-3.5 rounded-2xl bg-white hover:bg-slate-100 text-slate-800 font-semibold text-sm sm:text-base border border-slate-300 transition-all cursor-pointer">
+              📖 BBiG-Cheat-Sheet nachlesen
+            </button>
+          </div>
+
+        </div>
+      `;
+    }
+
+    function render() {
+      renderProgressBar();
+      const app = document.getElementById("app-container");
+
+      if (state.screen === "welcome") {
+        app.innerHTML = renderWelcome();
+      } else if (state.screen === "station") {
+        app.innerHTML = renderStation();
+      } else if (state.screen === "profi") {
+        app.innerHTML = renderProfiCheck();
+      } else if (state.screen === "summary") {
+        app.innerHTML = renderSummary();
+      }
+    }
+
+    // Initialer Start
+    window.addEventListener("DOMContentLoaded", () => {
+      render();
+    });
+  </script>
+</body>
+</html>
